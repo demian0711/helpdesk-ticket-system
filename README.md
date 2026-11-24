@@ -72,6 +72,15 @@ Mỗi ticket sẽ có tiêu đề, mô tả, độ ưu tiên, trạng thái, ng�
 
 MVP sẽ dùng tài khoản demo và dữ liệu mẫu. Đăng ký công khai, email, tệp đính kèm và trang tổng quan nằm ngoài phạm vi của MVP.
 
+## Data model
+
+Flyway manages the PostgreSQL schema. Hibernate validates the schema at startup.
+
+- `users` stores accounts and their roles. Future API endpoints will use DTOs and omit password hashes.
+- `tickets` links to a requester and optionally an assignee in `users`. New tickets start as `OPEN`.
+- `ticket_comments` links each comment to a ticket and its author in `users`.
+- `ticket_events` links each assignment or status change to a ticket and its actor in `users`. It records the time and the previous and new assignee or status.
+
 ## Luồng demo dự kiến
 
 1. Đăng nhập với vai trò REQUESTER và tạo ticket. Ticket có trạng thái ban đầu là `OPEN` và xuất hiện trong danh sách ticket của bạn. Thêm một bình luận.
