@@ -1,6 +1,6 @@
 # Helpdesk Ticket System
 
-Đây là dự án cá nhân phát triển ứng dụng tiếp nhận, phân công và theo dõi ticket hỗ trợ. Dự án đang được phát triển. Ở mốc hiện tại, ứng dụng có màn hình kiểm tra kết nối giữa React, Spring Boot và PostgreSQL.
+Đây là dự án cá nhân phát triển ứng dụng tiếp nhận, phân công và theo dõi ticket hỗ trợ. Dự án đang được phát triển. Ở mốc hiện tại, ứng dụng có màn hình đăng nhập và API kiểm tra kết nối PostgreSQL.
 
 ## Công nghệ và cấu trúc repo
 
@@ -8,7 +8,7 @@
 - `frontend/` sử dụng React với JavaScript và Vite.
 - `compose.yaml` chạy PostgreSQL 17 trên máy và lưu dữ liệu trong một volume có tên.
 
-Trong quá trình phát triển, Vite chuyển tiếp các yêu cầu `/api` đến Spring Boot tại `http://localhost:8080` để trình duyệt có thể gửi yêu cầu cùng nguồn. Ở mốc xác thực, dự án sẽ bổ sung Spring Security với cookie phiên và cơ chế bảo vệ CSRF.
+Trong quá trình phát triển, Vite chuyển tiếp các yêu cầu `/api` đến Spring Boot tại `http://localhost:8080` để trình duyệt có thể gửi yêu cầu cùng nguồn. Spring Security dùng cookie phiên và bảo vệ các yêu cầu thay đổi dữ liệu bằng CSRF.
 
 ## Chạy trên máy bằng Git Bash
 
@@ -44,7 +44,7 @@ npm ci
 npm run dev
 ```
 
-Mở `http://localhost:5173`. Khi kết nối thành công, trang sẽ hiển thị **Backend and PostgreSQL are connected.** Bạn cũng có thể mở một cửa sổ Git Bash khác để gọi API trực tiếp và qua Vite.
+Mở `http://localhost:5173` để vào màn hình đăng nhập. Bạn có thể mở một cửa sổ Git Bash khác để kiểm tra kết nối PostgreSQL trực tiếp qua backend và qua Vite.
 
 ```bash
 curl --fail http://localhost:8080/api/health
@@ -57,6 +57,20 @@ Cả hai yêu cầu sẽ trả về `{"status":"UP","database":"UP"}`. Endpoint 
 
 Nhấn Ctrl+C để dừng các máy chủ phát triển. Từ thư mục gốc của repo, chạy `docker compose --env-file .env down` để dừng PostgreSQL và giữ lại dữ liệu.
 
+
+## Đăng nhập bằng tài khoản demo
+
+Để bật demo, đặt `HELPDESK_DEMO_ENABLED=true` trong tệp `.env` ở thư mục gốc. Khởi động lại backend bằng khối lệnh ở cửa sổ 2 để nạp cấu hình. Spring Boot tạo các tài khoản còn thiếu khi demo được bật. Khi tắt demo, các tài khoản đã tạo vẫn nằm trong cơ sở dữ liệu nhưng không thể đăng nhập.
+
+| Vai trò | Email | Mật khẩu demo |
+| --- | --- | --- |
+| REQUESTER | `requester@helpdesk.test` | `HelpdeskDemo!2026` |
+| AGENT | `agent@helpdesk.test` | `HelpdeskDemo!2026` |
+| ADMIN | `admin@helpdesk.test` | `HelpdeskDemo!2026` |
+
+Mở `http://localhost:5173`, đăng nhập thử và nhấn **Sign out** để kết thúc phiên. Mặc định demo tắt. Chỉ bật trên môi trường phát triển với dữ liệu thử.
+
+React gọi `GET /api/auth/csrf` ngay trước mỗi yêu cầu POST để lấy tên header và token hiện tại. `POST /api/auth/login` nhận `email` và `password` dạng form, `GET /api/auth/me` trả về ID, email và vai trò, còn `POST /api/auth/logout` kết thúc phiên. Spring Security vô hiệu hóa token cũ khi đăng nhập hoặc đăng xuất. React lấy token mới trước lần POST tiếp theo. Phiên thiếu hoặc hết hạn trả về HTTP `401`. Yêu cầu bị từ chối, chẳng hạn POST thiếu token CSRF hợp lệ, trả về HTTP `403`.
 
 ## Phạm vi dự kiến của MVP
 

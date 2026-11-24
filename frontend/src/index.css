@@ -12,18 +12,66 @@ body {
 }
 
 main {
-  margin: 1rem;
-  padding: 2rem;
+  box-sizing: border-box;
+  width: min(27rem, calc(100% - 2rem));
+  padding: clamp(1.25rem, 5vw, 2rem);
   border: 1px solid #d6e0eb;
   border-radius: 0.75rem;
   background: #fff;
 }
 
 h1 {
-  margin: 0 0 0.75rem;
+  margin: 0 0 1.5rem;
   font-size: 1.5rem;
+}
+
+h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
 }
 
 p {
   margin: 0;
+}
+
+form,
+.account {
+  display: grid;
+  gap: 0.5rem;
+}
+
+input,
+button {
+  font: inherit;
+  border-radius: 0.375rem;
+  padding: 0.625rem 0.75rem;
+}
+
+input {
+  min-width: 0;
+  border: 1px solid #8f9fb4;
+  color: inherit;
+}
+
+button {
+  margin-top: 0.5rem;
+  border: 1px solid transparent;
+  background: #204f9f;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+:focus-visible {
+  outline: 2px solid #204f9f;
+  outline-offset: 2px;
+}
+
+.error {
+  margin-top: 1rem;
+  color: #a61a28;
 }
