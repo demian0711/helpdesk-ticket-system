@@ -1,0 +1,30 @@
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# IDE and editor files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.factorypath
+.vs/
+*.suo
+*.user
+*.swp
+*.swo
+
+# Logs
+*.log
+*.log.*
+logs/
+
+# Build output and dependencies
+/backend/target/
+/frontend/node_modules/
+/frontend/dist/
