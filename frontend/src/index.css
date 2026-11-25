@@ -6,8 +6,12 @@
 
 body {
   margin: 0;
+}
+
+#root {
   min-height: 100vh;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   place-items: center;
 }
 
@@ -76,6 +80,7 @@ button:disabled {
 }
 
 .workspace {
+  align-self: start;
   width: min(60rem, calc(100% - 2rem));
   margin-block: 2rem;
 }
