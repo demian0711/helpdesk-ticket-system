@@ -1,35 +1,38 @@
 export class ApiError extends Error {
-  constructor(status) {
-    super(`Request failed with HTTP ${status}`)
+  constructor(status, details) {
+    super(details?.message ?? `Request failed with HTTP ${status}`)
     this.status = status
+    this.fields = details?.fields
   }
 }
 
-async function request(path, options) {
-  const response = await fetch(`/api/auth${path}`, options)
+export async function request(path, options) {
+  const response = await fetch(`/api${path}`, options)
   if (!response.ok) {
-    throw new ApiError(response.status)
+    const details = response.status === 400 ? await response.json().catch(() => null) : null
+    throw new ApiError(response.status, details)
   }
   return response
 }
 
-async function postWithCsrf(path, body) {
-  const { headerName, token } = await (await request('/csrf')).json()
-  await request(path, {
+export async function postWithCsrf(path, { body, headers, signal } = {}) {
+  const { headerName, token } = await (await request('/auth/csrf', { signal })).json()
+  return request(path, {
     method: 'POST',
-    headers: { [headerName]: token },
+    headers: { ...headers, [headerName]: token },
     body,
+    signal,
   })
 }
 
 export async function getCurrentUser(signal) {
-  return (await request('/me', { signal })).json()
+  return (await request('/auth/me', { signal })).json()
 }
 
 export function signIn(email, password) {
-  return postWithCsrf('/login', new URLSearchParams({ email, password }))
+  return postWithCsrf('/auth/login', { body: new URLSearchParams({ email, password }) })
 }
 
 export function signOut() {
-  return postWithCsrf('/logout')
+  return postWithCsrf('/auth/logout')
 }

@@ -23,6 +23,7 @@ class SecurityConfig {
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/health", "/api/auth/csrf").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers("/api/tickets", "/api/tickets/**").hasRole("REQUESTER")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().denyAll())
                 .requestCache(cache -> cache.disable())

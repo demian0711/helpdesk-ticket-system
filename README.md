@@ -1,6 +1,6 @@
 # Helpdesk Ticket System
 
-Đây là dự án cá nhân phát triển ứng dụng tiếp nhận, phân công và theo dõi ticket hỗ trợ. Dự án đang được phát triển. Ở mốc hiện tại, ứng dụng có màn hình đăng nhập và API kiểm tra kết nối PostgreSQL.
+Đây là dự án cá nhân phát triển ứng dụng tiếp nhận, phân công và theo dõi ticket hỗ trợ. Dự án đang được phát triển. Ở mốc hiện tại, ứng dụng có màn hình đăng nhập, luồng tạo và xem ticket dành cho REQUESTER, cùng API kiểm tra kết nối PostgreSQL.
 
 ## Công nghệ và cấu trúc repo
 
@@ -80,6 +80,12 @@ Nhấn Ctrl+C để dừng các máy chủ phát triển. Từ thư mục gốc 
 Mở `http://localhost:5173`, đăng nhập thử và nhấn **Sign out** để kết thúc phiên. Mặc định demo tắt. Chỉ bật trên môi trường phát triển với dữ liệu thử.
 
 React gọi `GET /api/auth/csrf` ngay trước mỗi yêu cầu POST để lấy tên header và token hiện tại. `POST /api/auth/login` nhận `email` và `password` dạng form, `GET /api/auth/me` trả về ID, email và vai trò, còn `POST /api/auth/logout` kết thúc phiên. Spring Security vô hiệu hóa token cũ khi đăng nhập hoặc đăng xuất. React lấy token mới trước lần POST tiếp theo. Phiên thiếu hoặc hết hạn trả về HTTP `401`. Yêu cầu bị từ chối, chẳng hạn POST thiếu token CSRF hợp lệ, trả về HTTP `403`.
+
+## Luồng Requester
+
+Đăng nhập bằng tài khoản demo REQUESTER. Trong **My Tickets**, chọn **New Ticket**, điền tiêu đề, mô tả và độ ưu tiên rồi chọn **Create Ticket**. Ticket mới bắt đầu ở trạng thái `OPEN`. Ứng dụng mở **Ticket Details** sau khi tạo thành công. Bạn có thể quay về **My Tickets** để xem danh sách ticket của mình.
+
+`GET /api/tickets` liệt kê ticket của người đang đăng nhập, `POST /api/tickets` tạo ticket và `GET /api/tickets/{id}` mở chi tiết. Backend lấy người tạo từ phiên đăng nhập. Nếu ticket không tồn tại hoặc thuộc về người khác, API chi tiết trả HTTP `404`.
 
 ## Phạm vi dự kiến của MVP
 

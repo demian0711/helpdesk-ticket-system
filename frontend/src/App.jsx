@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getCurrentUser, signIn, signOut } from './authApi.js'
+import RequesterTickets from './RequesterTickets.jsx'
 
 const forbidden = 'You do not have permission to complete this request.'
 const expired = 'Your session has expired. Sign in again.'
@@ -9,6 +10,11 @@ function App() {
   const [user, setUser] = useState(undefined)
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
+
+  const handleExpired = useCallback(() => {
+    setUser(null)
+    setMessage(expired)
+  }, [])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -94,6 +100,22 @@ function App() {
     } finally {
       setBusy(false)
     }
+  }
+
+  if (user?.role === 'REQUESTER') {
+    return (
+      <main className="workspace">
+        <header className="workspace-header">
+          <div>
+            <h1>Helpdesk Ticket System</h1>
+            <p>{user.email}</p>
+          </div>
+          <button type="button" onClick={handleLogout} disabled={busy}>{busy ? 'Signing out…' : 'Sign out'}</button>
+        </header>
+        {message && <p className="error" role="alert">{message}</p>}
+        <RequesterTickets key={user.id} onExpired={handleExpired} />
+      </main>
+    )
   }
 
   return (

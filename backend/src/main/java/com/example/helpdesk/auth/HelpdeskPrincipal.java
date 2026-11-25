@@ -4,7 +4,7 @@ import com.example.helpdesk.model.User;
 import com.example.helpdesk.model.UserRole;
 import org.springframework.security.core.authority.AuthorityUtils;
 
-class HelpdeskPrincipal extends org.springframework.security.core.userdetails.User {
+public class HelpdeskPrincipal extends org.springframework.security.core.userdetails.User {
 
     private final Long id;
     private final UserRole role;
@@ -15,7 +15,7 @@ class HelpdeskPrincipal extends org.springframework.security.core.userdetails.Us
         this.role = user.getRole();
     }
 
-    Long id() {
+    public Long id() {
         return id;
     }
 
