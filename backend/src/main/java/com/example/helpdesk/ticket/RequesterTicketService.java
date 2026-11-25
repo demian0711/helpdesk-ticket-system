@@ -1,13 +1,12 @@
 package com.example.helpdesk.ticket;
 
+import com.example.helpdesk.auth.HelpdeskPrincipal;
 import com.example.helpdesk.model.Ticket;
 import com.example.helpdesk.model.TicketPriority;
 import com.example.helpdesk.model.User;
 import jakarta.persistence.EntityManager;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -16,10 +15,12 @@ class RequesterTicketService {
 
     private final TicketRepository tickets;
     private final EntityManager entityManager;
+    private final TicketAccess access;
 
-    RequesterTicketService(TicketRepository tickets, EntityManager entityManager) {
+    RequesterTicketService(TicketRepository tickets, EntityManager entityManager, TicketAccess access) {
         this.tickets = tickets;
         this.entityManager = entityManager;
+        this.access = access;
     }
 
     @Transactional
@@ -34,8 +35,7 @@ class RequesterTicketService {
     }
 
     @Transactional(readOnly = true)
-    Ticket get(Long requesterId, Long ticketId) {
-        return tickets.findByIdAndRequester_Id(ticketId, requesterId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    Ticket get(HelpdeskPrincipal actor, Long ticketId) {
+        return access.require(actor, ticketId);
     }
 }

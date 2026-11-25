@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { getCurrentUser, request, requestWithCsrf } from './authApi.js'
 import { statuses } from './ticketApi.js'
 import { TicketCard, TicketRows } from './TicketViews.jsx'
+import TicketDiscussion from './TicketDiscussion.jsx'
 
 const listPath = '#/tickets'
 const nextStatuses = { OPEN: 'IN_PROGRESS', IN_PROGRESS: 'RESOLVED' }
@@ -160,6 +161,7 @@ function WorkflowDetail({ path, heading, admin, agents, onExpired }) {
           {busy ? 'Saving…' : next === 'IN_PROGRESS' ? 'Start work' : 'Resolve ticket'}
         </button>
       )}
+      {ticket && <TicketDiscussion id={ticket.id} version={ticket.version} onExpired={onExpired} />}
     </section>
   )
 }

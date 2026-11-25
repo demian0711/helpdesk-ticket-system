@@ -1,6 +1,6 @@
 # Helpdesk Ticket System
 
-Đây là dự án cá nhân phát triển ứng dụng tiếp nhận, phân công và theo dõi ticket hỗ trợ. Dự án đang được phát triển. Ở mốc hiện tại, ứng dụng có màn hình đăng nhập, luồng tạo và xem ticket dành cho REQUESTER, cùng API kiểm tra kết nối PostgreSQL.
+Đây là dự án cá nhân phát triển ứng dụng tiếp nhận, phân công và theo dõi ticket hỗ trợ. Dự án đang được phát triển. Ở mốc hiện tại, ứng dụng đã có đăng nhập, tạo ticket, phân công, chuyển trạng thái, bình luận và lịch sử xử lý.
 
 ## Công nghệ và cấu trúc repo
 
@@ -110,9 +110,13 @@ Flyway manages the PostgreSQL schema. Hibernate validates the schema at startup.
 - `ticket_comments` links each comment to a ticket and its author in `users`.
 - `ticket_events` links each assignment or status change to a ticket and its actor in `users`. It records the time and the previous and new assignee or status.
 
-## Luồng demo dự kiến
+## Luồng demo với ba tài khoản
 
-1. Đăng nhập với vai trò REQUESTER và tạo ticket. Ticket có trạng thái ban đầu là `OPEN` và xuất hiện trong danh sách ticket của bạn. Thêm một bình luận.
-2. Đăng nhập với vai trò ADMIN, tìm ticket vừa tạo và giao cho một tài khoản demo có vai trò AGENT.
-3. Đăng nhập bằng tài khoản AGENT được giao, mở ticket và chuyển sang `IN_PROGRESS`. Thêm bình luận mô tả cách xử lý rồi chuyển ticket sang `RESOLVED`.
-4. Đăng nhập lại với vai trò REQUESTER và kiểm tra ticket đã ở trạng thái `RESOLVED`. Sau đó, dùng tài khoản ADMIN để kiểm tra lịch sử có ghi lần phân công và cả hai lần đổi trạng thái, kèm người thực hiện và thời điểm của từng thay đổi.
+Đặt `HELPDESK_DEMO_ENABLED=true` trong `.env`, khởi động lại backend bằng `bash scripts/run-backend.sh` và mở `http://localhost:5173`. Cả ba tài khoản dưới đây dùng mật khẩu demo `HelpdeskDemo!2026`. Chọn **Sign out** trước khi đổi tài khoản, hoặc dùng các hồ sơ trình duyệt riêng để giữ cả ba phiên.
+
+1. **REQUESTER** — đăng nhập bằng `requester@helpdesk.test`. Trong **My Tickets**, tạo ticket “Mất kết nối Wi-Fi” với độ ưu tiên **High**. Trong **Ticket Details**, đăng bình luận “Máy không thấy mạng Wi-Fi công ty”. Ticket ở trạng thái `OPEN` và **Activity History** chưa có sự kiện.
+2. **ADMIN** — đăng nhập bằng `admin@helpdesk.test`. Mở ticket trong **All Tickets**, chọn `agent@helpdesk.test` ở **Assign to agent** rồi nhấn **Save assignment**. Bình luận “Nhờ kiểm tra cấu hình mạng”. Kiểm tra **Activity History** có lần phân công, email ADMIN và thời điểm.
+3. **AGENT** — đăng nhập bằng `agent@helpdesk.test`. Mở ticket từ **Assigned Tickets**, chọn **Start work**, đăng bình luận “Đã cập nhật cấu hình Wi-Fi”, rồi chọn **Resolve ticket**. Kiểm tra hai lần chuyển trạng thái xuất hiện trong lịch sử.
+4. **REQUESTER** — đăng nhập lại và mở ticket. Kiểm tra trạng thái `RESOLVED`, ba bình luận theo thứ tự đăng và ba sự kiện gồm một lần phân công, hai lần đổi trạng thái. Thử đăng bình luận chỉ có dấu cách để thấy lỗi lưu và kiểm tra danh sách không có thêm bình luận.
+
+Giới hạn bình luận là 2.000 ký tự. Ticket Details hiển thị **Comments** và **Activity History** cho ba vai trò theo quyền truy cập của ticket.

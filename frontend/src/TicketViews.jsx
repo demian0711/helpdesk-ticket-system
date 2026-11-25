@@ -3,7 +3,7 @@ import { statuses } from './ticketApi.js'
 const priorities = { LOW: 'Low', MEDIUM: 'Medium', HIGH: 'High' }
 const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' })
 
-function TicketTime({ value }) {
+export function TicketTime({ value }) {
   return <time dateTime={value}>{dateFormat.format(new Date(value))}</time>
 }
 

@@ -55,7 +55,7 @@ class RequesterTicketController {
 
     @GetMapping("/{id}")
     TicketDetails get(@AuthenticationPrincipal HelpdeskPrincipal user, @PathVariable Long id) {
-        return TicketDetails.from(tickets.get(user.id(), id));
+        return TicketDetails.from(tickets.get(user, id));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

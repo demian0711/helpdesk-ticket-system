@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { getCurrentUser } from './authApi.js'
 import { createTicket, getTicket, listTickets } from './ticketApi.js'
 import { TicketCard, TicketRows } from './TicketViews.jsx'
+import TicketDiscussion from './TicketDiscussion.jsx'
 
 const listPath = '#/tickets'
 const newPath = '#/tickets/new'
@@ -61,6 +62,7 @@ function TicketDetails({ id, onExpired }) {
       {loading && <p role="status">Loading ticket…</p>}
       {error && <p className="error" role="alert">{error}</p>}
       {ticket && <TicketCard ticket={ticket} />}
+      {ticket && <TicketDiscussion id={ticket.id} onExpired={onExpired} />}
     </section>
   )
 }

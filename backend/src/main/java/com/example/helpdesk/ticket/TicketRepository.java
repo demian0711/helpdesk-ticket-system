@@ -7,17 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     List<Ticket> findAllByRequester_IdOrderByUpdatedAtDescIdDesc(Long requesterId);
 
-    Optional<Ticket> findByIdAndRequester_Id(Long id, Long requesterId);
-
     List<Ticket> findAllByAssignee_IdOrderByUpdatedAtDescIdDesc(Long assigneeId);
-
-    Optional<Ticket> findByIdAndAssignee_Id(Long id, Long assigneeId);
 
     @Query("""
             SELECT t FROM Ticket t LEFT JOIN FETCH t.assignee a

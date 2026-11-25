@@ -22,10 +22,12 @@ class TicketWorkflowService {
 
     private final TicketRepository tickets;
     private final EntityManager entityManager;
+    private final TicketAccess access;
 
-    TicketWorkflowService(TicketRepository tickets, EntityManager entityManager) {
+    TicketWorkflowService(TicketRepository tickets, EntityManager entityManager, TicketAccess access) {
         this.tickets = tickets;
         this.entityManager = entityManager;
+        this.access = access;
     }
 
     @Transactional(readOnly = true)
@@ -37,7 +39,7 @@ class TicketWorkflowService {
     @Transactional(readOnly = true)
     WorkTicket adminDetail(HelpdeskPrincipal actor, Long ticketId) {
         requireRole(actor, UserRole.ADMIN);
-        return WorkTicket.from(findTicket(ticketId));
+        return WorkTicket.from(access.require(actor, ticketId));
     }
 
     @Transactional(readOnly = true)
@@ -60,13 +62,13 @@ class TicketWorkflowService {
     @Transactional(readOnly = true)
     WorkTicket assignedDetail(HelpdeskPrincipal actor, Long ticketId) {
         requireRole(actor, UserRole.AGENT);
-        return WorkTicket.from(findAssignedTicket(ticketId, actor.id()));
+        return WorkTicket.from(access.require(actor, ticketId));
     }
 
     @Transactional
     WorkTicket assign(HelpdeskPrincipal actor, Long ticketId, Long assigneeId, Long expectedVersion) {
         requireRole(actor, UserRole.ADMIN);
-        Ticket ticket = findTicket(ticketId);
+        Ticket ticket = access.require(actor, ticketId);
         checkVersion(ticket, expectedVersion);
         if (ticket.getStatus() != TicketStatus.OPEN) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Only open tickets can be assigned.");
@@ -90,7 +92,7 @@ class TicketWorkflowService {
     @Transactional
     WorkTicket changeStatus(HelpdeskPrincipal actor, Long ticketId, TicketStatus nextStatus, Long expectedVersion) {
         requireRole(actor, UserRole.AGENT);
-        Ticket ticket = findAssignedTicket(ticketId, actor.id());
+        Ticket ticket = access.require(actor, ticketId);
         checkVersion(ticket, expectedVersion);
         TicketStatus previous = ticket.getStatus();
         boolean valid = switch (previous) {
@@ -106,16 +108,6 @@ class TicketWorkflowService {
         tickets.flush();
         entityManager.persist(TicketEvent.statusChanged(ticket, actorReference(actor), previous, nextStatus));
         return WorkTicket.from(ticket);
-    }
-
-    private Ticket findTicket(Long ticketId) {
-        return tickets.findById(ticketId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found."));
-    }
-
-    private Ticket findAssignedTicket(Long ticketId, Long agentId) {
-        return tickets.findByIdAndAssignee_Id(ticketId, agentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found or not assigned to you."));
     }
 
     private User actorReference(HelpdeskPrincipal actor) {

@@ -23,6 +23,8 @@ class SecurityConfig {
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/health", "/api/auth/csrf").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/tickets/{id}/discussion").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/tickets/{id}/comments").authenticated()
                         .requestMatchers("/api/tickets", "/api/tickets/**").hasRole("REQUESTER")
                         .requestMatchers("/api/admin/tickets", "/api/admin/tickets/**", "/api/admin/agents").hasRole("ADMIN")
                         .requestMatchers("/api/agent/tickets", "/api/agent/tickets/**").hasRole("AGENT")
