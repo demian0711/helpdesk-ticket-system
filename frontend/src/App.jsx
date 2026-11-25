@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { getCurrentUser, signIn, signOut } from './authApi.js'
 import RequesterTickets from './RequesterTickets.jsx'
+import WorkflowTickets from './WorkflowTickets.jsx'
 
 const forbidden = 'You do not have permission to complete this request.'
 const expired = 'Your session has expired. Sign in again.'
@@ -102,7 +103,7 @@ function App() {
     }
   }
 
-  if (user?.role === 'REQUESTER') {
+  if (user) {
     return (
       <main className="workspace">
         <header className="workspace-header">
@@ -113,7 +114,9 @@ function App() {
           <button type="button" onClick={handleLogout} disabled={busy}>{busy ? 'Signing out…' : 'Sign out'}</button>
         </header>
         {message && <p className="error" role="alert">{message}</p>}
-        <RequesterTickets key={user.id} onExpired={handleExpired} />
+        {user.role === 'REQUESTER'
+          ? <RequesterTickets key={user.id} onExpired={handleExpired} />
+          : <WorkflowTickets key={user.id} role={user.role} onExpired={handleExpired} />}
       </main>
     )
   }
@@ -131,14 +134,6 @@ function App() {
           <input id="password" name="password" type="password" autoComplete="current-password" required />
           <button type="submit" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
         </form>
-      )}
-      {user && (
-        <section className="account">
-          <h2>Signed in</h2>
-          <p>{user.email}</p>
-          <p>{user.role}</p>
-          <button type="button" onClick={handleLogout} disabled={busy}>{busy ? 'Signing out…' : 'Sign out'}</button>
-        </section>
       )}
       {message && <p className="error" role="alert">{message}</p>}
     </main>

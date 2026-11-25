@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { getCurrentUser } from './authApi.js'
 import { createTicket, getTicket, listTickets } from './ticketApi.js'
+import { TicketCard, TicketRows } from './TicketViews.jsx'
 
 const listPath = '#/tickets'
 const newPath = '#/tickets/new'
-const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' })
-const statuses = { OPEN: 'Open', IN_PROGRESS: 'In progress', RESOLVED: 'Resolved' }
 const priorities = { LOW: 'Low', MEDIUM: 'Medium', HIGH: 'High' }
 
 function ticketError(error, ticketId) {
@@ -48,24 +47,7 @@ function TicketList({ onExpired }) {
       {loading && <p role="status">Loading tickets…</p>}
       {error && <p className="error" role="alert">{error}</p>}
       {data?.length === 0 && <p className="ticket-empty">You haven’t created a ticket yet.</p>}
-      {data?.length > 0 && (
-        <ul className="ticket-list">
-          {data.map((ticket) => (
-            <li key={ticket.id}>
-              <a className="ticket-row" href={`${listPath}/${ticket.id}`}>
-                <div>
-                  <span className="ticket-title">{ticket.title}</span>
-                  <span className="ticket-meta">#{ticket.id} · {priorities[ticket.priority]} priority</span>
-                </div>
-                <div className="ticket-row-end">
-                  <span className="status-pill">{statuses[ticket.status]}</span>
-                  <time dateTime={ticket.updatedAt}>{dateFormat.format(new Date(ticket.updatedAt))}</time>
-                </div>
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
+      {data?.length > 0 && <TicketRows tickets={data} listPath={listPath} />}
     </section>
   )
 }
@@ -78,22 +60,7 @@ function TicketDetails({ id, onExpired }) {
       <h2 id="details-heading">Ticket Details</h2>
       {loading && <p role="status">Loading ticket…</p>}
       {error && <p className="error" role="alert">{error}</p>}
-      {ticket && (
-        <article className="ticket-detail">
-          <div className="ticket-heading">
-            <h3>{ticket.title}</h3>
-            <span className="status-pill">{statuses[ticket.status]}</span>
-          </div>
-          <dl className="ticket-facts">
-            <div><dt>Ticket</dt><dd>#{ticket.id}</dd></div>
-            <div><dt>Priority</dt><dd>{priorities[ticket.priority]}</dd></div>
-            <div><dt>Created</dt><dd><time dateTime={ticket.createdAt}>{dateFormat.format(new Date(ticket.createdAt))}</time></dd></div>
-            <div><dt>Updated</dt><dd><time dateTime={ticket.updatedAt}>{dateFormat.format(new Date(ticket.updatedAt))}</time></dd></div>
-          </dl>
-          <h4>Description</h4>
-          <p className="ticket-description">{ticket.description}</p>
-        </article>
-      )}
+      {ticket && <TicketCard ticket={ticket} />}
     </section>
   )
 }

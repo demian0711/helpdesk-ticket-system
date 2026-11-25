@@ -11,8 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.SourceType;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
@@ -24,6 +24,10 @@ public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Version
+    @Column(nullable = false)
+    private Long version;
 
     @Column(nullable = false, length = 200)
     private String title;
@@ -47,11 +51,11 @@ public class Ticket {
     @JoinColumn(name = "assignee_id")
     private User assignee;
 
-    @CreationTimestamp(source = SourceType.DB)
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @UpdateTimestamp(source = SourceType.DB)
+    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
@@ -63,6 +67,18 @@ public class Ticket {
         this.description = description;
         this.priority = priority;
         this.requester = requester;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void assignTo(User assignee) {
+        this.assignee = assignee;
+    }
+
+    public void changeStatus(TicketStatus status) {
+        this.status = status;
     }
 
     public Long getId() {

@@ -1,4 +1,6 @@
-import { postWithCsrf, request } from './authApi.js'
+import { requestWithCsrf, request } from './authApi.js'
+
+export const statuses = { OPEN: 'Open', IN_PROGRESS: 'In progress', RESOLVED: 'Resolved' }
 
 export async function listTickets(signal) {
   return (await request('/tickets', { signal })).json()
@@ -9,7 +11,7 @@ export async function getTicket(id, signal) {
 }
 
 export async function createTicket(ticket, signal) {
-  const response = await postWithCsrf('/tickets', {
+  const response = await requestWithCsrf('/tickets', {
     body: JSON.stringify(ticket),
     headers: { 'Content-Type': 'application/json' },
     signal,

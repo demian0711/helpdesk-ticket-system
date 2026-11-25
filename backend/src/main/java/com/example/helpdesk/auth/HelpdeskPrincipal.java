@@ -19,7 +19,7 @@ public class HelpdeskPrincipal extends org.springframework.security.core.userdet
         return id;
     }
 
-    UserRole role() {
+    public UserRole role() {
         return role;
     }
 }
