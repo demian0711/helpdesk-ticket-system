@@ -27,14 +27,12 @@ docker compose ps
 Chạy khối lệnh sau từ thư mục gốc của repo.
 
 ```bash
-set -a
-source <(sed 's/\r$//' .env)
-set +a
-cd backend
-bash ./mvnw spring-boot:run -Dspring-boot.run.jvmArguments="-Duser.timezone=UTC"
+bash scripts/run-backend.sh
 ```
 
-Tùy chọn này đặt múi giờ của tiến trình Spring Boot thành UTC để tránh lỗi PostgreSQL từ chối giá trị TimeZone `"Asia/Saigon"`.
+Script nạp `.env` và kiểm tra cổng backend trước khi chạy Maven Wrapper. Backend mặc định dùng cổng `8080`. Nếu cổng bận, script hiển thị cổng và PID rồi thoát. Khi `/api/health` xác nhận đó là Helpdesk, bạn có thể dùng bản đang chạy hoặc dừng nó trước khi chạy lại script.
+
+Script đặt múi giờ của tiến trình Spring Boot thành UTC để tránh lỗi PostgreSQL từ chối giá trị TimeZone `"Asia/Saigon"`.
 
 **Cửa sổ 3 — React**
 
@@ -53,14 +51,25 @@ curl --fail http://localhost:5173/api/health
 
 Cả hai yêu cầu sẽ trả về `{"status":"UP","database":"UP"}`. Endpoint này chạy truy vấn `SELECT 1` trên PostgreSQL. Nếu backend đang chạy nhưng mất kết nối với cơ sở dữ liệu, endpoint trả về HTTP 503 với nội dung `{"status":"DOWN","database":"DOWN"}`.
 
-Để kiểm tra bản dựng backend và chạy bài kiểm thử khởi tạo ngữ cảnh Spring, mở một cửa sổ Git Bash mới, nạp biến môi trường cơ sở dữ liệu và vào thư mục `backend/` như ở cửa sổ 2. Sau đó chạy `bash ./mvnw --version` và `bash ./mvnw test`. Để kiểm tra bản dựng frontend, chạy `npm run build` trong `frontend/` sau khi chạy `npm ci`.
+Để kiểm tra bản dựng backend và chạy bài kiểm thử khởi tạo ngữ cảnh Spring, mở một cửa sổ Git Bash mới tại thư mục gốc và chạy các lệnh sau.
+
+```bash
+set -a
+source <(sed 's/\r$//' .env)
+set +a
+cd backend
+bash ./mvnw --version
+bash ./mvnw test
+```
+
+Để kiểm tra bản dựng frontend, chạy `npm run build` trong `frontend/` sau khi chạy `npm ci`.
 
 Nhấn Ctrl+C để dừng các máy chủ phát triển. Từ thư mục gốc của repo, chạy `docker compose --env-file .env down` để dừng PostgreSQL và giữ lại dữ liệu.
 
 
 ## Đăng nhập bằng tài khoản demo
 
-Để bật demo, đặt `HELPDESK_DEMO_ENABLED=true` trong tệp `.env` ở thư mục gốc. Khởi động lại backend bằng khối lệnh ở cửa sổ 2 để nạp cấu hình. Spring Boot tạo các tài khoản còn thiếu khi demo được bật. Khi tắt demo, các tài khoản đã tạo vẫn nằm trong cơ sở dữ liệu nhưng không thể đăng nhập.
+Để bật demo, đặt `HELPDESK_DEMO_ENABLED=true` trong tệp `.env` ở thư mục gốc. Dừng backend đang chạy rồi chạy `bash scripts/run-backend.sh` để nạp cấu hình. Spring Boot tạo các tài khoản còn thiếu khi demo được bật. Khi tắt demo, các tài khoản đã tạo vẫn nằm trong cơ sở dữ liệu nhưng không thể đăng nhập.
 
 | Vai trò | Email | Mật khẩu demo |
 | --- | --- | --- |
